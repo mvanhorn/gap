@@ -749,9 +749,9 @@ InstallMethod( \{\},
     return Vector( Unpack( v ){ poss }, v );
     end );
 
-InstallMethod( ExtractSubVector,
-    "generic method for a vector object and a list",
-    [ IsVectorObj, IsList ],
+InstallOtherMethod( ExtractSubVector,
+    "generic method for a row vector or vector object and a list",
+    [ IsRowVectorOrVectorObj, IsList ],
     { v, l } -> v{ l } );
 
 InstallMethod( ExtractSubMatrix,
@@ -759,20 +759,18 @@ InstallMethod( ExtractSubMatrix,
     [ IsMatrixObj, IsList, IsList ],
     { M, rowpos, colpos } -> Matrix( Unpack( M ){ rowpos }{ colpos }, M ) );
 
-# Hack from recog package
-InstallOtherMethod( ExtractSubMatrix, "hack: for lists of compressed vectors",
-[ IsList, IsList, IsList ],
-function( m, poss1, poss2 )
-  local i,n;
-  n := [];
-  for i in poss1 do
-      Add(n,ShallowCopy(m[i]{poss2}));
-  od;
-  if IsFFE(m[1,1]) then
-      ConvertToMatrixRep(n);
-  fi;
-  return n;
-end );
+InstallOtherMethod( ExtractSubMatrix,
+    "generic method for a matrix and two lists",
+    [ IsList, IsList, IsList ],
+    { M, rowpos, colpos } -> M{ rowpos }{ colpos } );
+
+InstallEarlyMethod( ExtractSubMatrix,
+    function(M, rowpos, colpos)
+    if IsPlistRep(M) then
+        return M{ rowpos }{ colpos };
+    fi;
+    TryNextMethod();
+end);
 
 InstallMethod( CopySubVector,
     "generic method for row vectors and vector objects",
@@ -786,6 +784,22 @@ InstallMethod( CopySubVector,
     for i in [ 1 .. Length( dcols ) ] do
       dst[dcols[i]] := src[scols[i]];
     od;
+end );
+
+InstallMethod( CopySubVector,
+    "generic method for row vectors",
+  [ IsRowVector, IsRowVector and IsMutable, IsList, IsList ],
+  function(src, dst, scols, dcols)
+    dst{dcols} := src{scols};
+end );
+
+InstallEarlyMethod( CopySubVector,
+  function(src, dst, scols, dcols)
+  if IsPlistRep(src) and IsPlistRep(dst) then
+    dst{dcols} := src{scols};
+  else
+    TryNextMethod();
+  fi;
 end );
 
 
@@ -1276,6 +1290,16 @@ InstallMethod( CopySubMatrix,
       od;
     od;
     end );
+
+InstallEarlyMethod( CopySubMatrix,
+    function( src, dst, srcrows, dstrows, srccols, dstcols )
+    if IsPlistRep(src) and IsPlistRep(dst) then
+        dst{dstrows}{dstcols} := src{srcrows}{srccols};
+        return;
+    fi;
+    TryNextMethod();
+end);
+
 
 
 #############################################################################
