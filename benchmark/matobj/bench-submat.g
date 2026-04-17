@@ -85,7 +85,3 @@ for dim in [10, 100] do
 
 # TODO: also add cvec matrices
 od;
-
-
-# TODO: also have similar benchmarks for CopySubVector etc.
-
