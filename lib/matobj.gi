@@ -761,16 +761,8 @@ InstallMethod( ExtractSubMatrix,
 
 InstallOtherMethod( ExtractSubMatrix,
     "generic method for a matrix and two lists",
-    [ IsList, IsList, IsList ],
+    [ IsMatrix, IsList, IsList ],
     { M, rowpos, colpos } -> M{ rowpos }{ colpos } );
-
-InstallEarlyMethod( ExtractSubMatrix,
-    function(M, rowpos, colpos)
-    if IsPlistRep(M) then
-        return M{ rowpos }{ colpos };
-    fi;
-    TryNextMethod();
-end);
 
 InstallMethod( CopySubVector,
     "generic method for row vectors and vector objects",
@@ -791,15 +783,6 @@ InstallMethod( CopySubVector,
   [ IsRowVector, IsRowVector and IsMutable, IsList, IsList ],
   function(src, dst, scols, dcols)
     dst{dcols} := src{scols};
-end );
-
-InstallEarlyMethod( CopySubVector,
-  function(src, dst, scols, dcols)
-  if IsPlistRep(src) and IsPlistRep(dst) then
-    dst{dcols} := src{scols};
-  else
-    TryNextMethod();
-  fi;
 end );
 
 
@@ -1290,16 +1273,6 @@ InstallMethod( CopySubMatrix,
       od;
     od;
     end );
-
-InstallEarlyMethod( CopySubMatrix,
-    function( src, dst, srcrows, dstrows, srccols, dstcols )
-    if IsPlistRep(src) and IsPlistRep(dst) then
-        dst{dstrows}{dstcols} := src{srcrows}{srccols};
-        return;
-    fi;
-    TryNextMethod();
-end);
-
 
 
 #############################################################################
