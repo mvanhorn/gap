@@ -280,6 +280,19 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  codecov_notify:
+    name: Finalize Codecov notifications
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ always() }}
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: "Send Codecov notifications"
+        uses: codecov/codecov-action@v6
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          run_command: send-notifications
 
   cross_compile:
     # The host should always be linux
