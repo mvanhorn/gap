@@ -282,7 +282,7 @@ jobs:
 
   codecov_notify:
     name: Finalize Codecov notifications
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: test
     if: ${{ always() }}
 
